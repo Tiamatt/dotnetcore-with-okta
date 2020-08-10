@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Okta.AspNetCore;
 
 namespace dotnetcore_with_okta
 {
@@ -25,6 +19,19 @@ namespace dotnetcore_with_okta
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // OKTA - Integrate OKTA into the project
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
+            })
+            .AddOktaWebApi(new OktaWebApiOptions()
+            {
+                OktaDomain = Configuration["Okta:OktaDomain"],
+                AuthorizationServerId = Configuration["Okta:AuthorizationServerId"]
+            });
+
             // SWAGGER - Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
 
@@ -67,6 +74,9 @@ namespace dotnetcore_with_okta
             app.UseCors("AllowAll");
 
             app.UseAuthorization();
+
+            // OKTA
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
