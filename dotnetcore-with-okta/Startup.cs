@@ -19,25 +19,9 @@ namespace dotnetcore_with_okta
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // OKTA - Integrate OKTA into the project
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
-            })
-            .AddOktaWebApi(new OktaWebApiOptions()
-            {
-                OktaDomain = Configuration["Okta:OktaDomain"],
-                AuthorizationServerId = Configuration["Okta:AuthorizationServerId"]
-            });
+            // NOTES: It is important to follow the order!!!!
 
-            // SWAGGER - Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen();
-
-            services.AddControllers();
-
-            // CORS 
+            // CORS
             services.AddCors(options =>
             {
                 // The CORS policy is open for testing purposes. In a production application, you should restrict it to known origins.
@@ -47,11 +31,33 @@ namespace dotnetcore_with_okta
                                       .AllowAnyMethod()
                                       .AllowAnyHeader());
             });
+
+            // SWAGGER
+            services.AddSwaggerGen();
+
+            // OKTA
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
+                    options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
+                    options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
+                })
+                .AddOktaWebApi(new OktaWebApiOptions()
+                {
+                    OktaDomain = Configuration["Okta:OktaDomain"],
+                });
+
+            services.AddAuthorization();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // NOTES: It is important to follow the order!!!!
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -59,29 +65,31 @@ namespace dotnetcore_with_okta
 
             app.UseHttpsRedirection();
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseRouting();
+
+            // CORS
+            app.UseCors("AllowAll");
+
+            // SWAGGER
             app.UseSwagger();
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            // SWAGGER
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
 
-            app.UseRouting();
-
-            // CORS
-            app.UseCors("AllowAll");
-
-            app.UseAuthorization();
-
             // OKTA
             app.UseAuthentication();
+
+            // OKTA
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }

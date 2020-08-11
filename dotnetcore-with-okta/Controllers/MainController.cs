@@ -18,33 +18,47 @@ namespace dotnetcore_with_okta.Controllers
             _logger = logger;
         }
 
-        // GET: api/<MainController>
+        // GET: api/main
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "MainValue1", "MainValue2" };
         }
 
-        // GET api/<MainController>/5
+        // GET api/main/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return "MainValue";
+            return "MainValue" + id.ToString();
         }
 
-        // POST api/<MainController>
+        // GET api/main/names
+        [HttpGet("Names")]
+        public IEnumerable<string> GetNames()
+        {
+            return new string[] { "MainName1", "MainName2" };
+        }
+
+        // GET api/main/name/5
+        [HttpGet("Name/{id}")]
+        public string GetName(int id)
+        {
+            return "MainName" + id.ToString();
+        }
+
+        // POST api/main
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<MainController>/5
+        // PUT api/main/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<MainController>/5
+        // DELETE api/main/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
