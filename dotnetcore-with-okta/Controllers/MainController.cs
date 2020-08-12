@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace dotnetcore_with_okta.Controllers
 {
+    [Authorize]
     [EnableCors("AllowAll")]
     [Produces("application/json")] // important!  [Produces] forces all apis to return JSON-formatted responses
     [Route("api/[controller]")]
@@ -34,6 +35,7 @@ namespace dotnetcore_with_okta.Controllers
         }
 
         // GET api/main/names
+        [AllowAnonymous]
         [HttpGet("Names")]
         public IEnumerable<string> GetNames()
         {
@@ -41,6 +43,7 @@ namespace dotnetcore_with_okta.Controllers
         }
 
         // GET api/main/name/5
+        [AllowAnonymous]
         [HttpGet("Name/{id}")]
         public string GetName(int id)
         {
