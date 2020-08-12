@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace dotnetcore_with_okta.Controllers
 {
     [EnableCors("AllowAll")]
+    [Produces("application/json")] // important!  [Produces] forces all apis to return JSON-formatted responses
     [Route("api/[controller]")]
     [ApiController]
     public class MainController : ControllerBase

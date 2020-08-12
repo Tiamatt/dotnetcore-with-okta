@@ -8,6 +8,7 @@ namespace dotnetcore_with_okta.Controllers
 {
     [Authorize]
     [EnableCors("AllowAll")]
+    [Produces("application/json")] // important!  [Produces] forces all apis to return JSON-formatted responses
     [Route("api/[controller]")]
     [ApiController]
     public class UserProfileController : ControllerBase
